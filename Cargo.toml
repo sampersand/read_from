@@ -1,9 +1,10 @@
 [package]
 name = "read-from"
-version = "0.1.0"
+version = "0.5.0"
 authors = ["Sam Westerman <sam@sampersand.me>"]
 license = "MIT OR Apache-2.0"
 edition = "2018"
 description = "Supplies the ReadFrom and WriteTo traits."
-
-[dependencies]
+repository = "https://github.com/sampersand/read_from"
+keywords = ["readfrom", "writeto", "convert", "io", "endian"]
+categories = ["parsing", "rust-patterns"]
