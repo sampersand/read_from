@@ -110,7 +110,8 @@ pub trait WriteTo {
 impl ReadFrom for u8 {
 	type Error = io::Error;
 
-	fn read_from<R: Read>(mut inp: R) -> io::Result<Self> {
+	#[inline]
+	fn read_from<R: Read>(mut inp: R) -> Result<Self, Self::Error> {
 		let mut buf = [0; 1];
 		inp.read_exact(&mut buf)?;
 		let [byte] = buf;
@@ -121,7 +122,8 @@ impl ReadFrom for u8 {
 impl ReadFrom for i8 {
 	type Error = io::Error;
 
-	fn read_from<R: Read>(mut inp: R) -> io::Result<Self> {
+	#[inline]
+	fn read_from<R: Read>(mut inp: R) -> Result<Self, Self::Error> {
 		let mut buf = [0; 1];
 		inp.read_exact(&mut buf)?;
 		let [byte] = buf;
@@ -132,7 +134,8 @@ impl ReadFrom for i8 {
 impl WriteTo for u8 {
 	type Error = io::Error;
 
-	fn write_to<W: Write>(&self, mut out: W) -> io::Result<usize> {
+	#[inline]
+	fn write_to<W: Write>(&self, mut out: W) -> Result<usize, Self::Error> {
 		out.write_all(&[*self]).and(Ok(1))
 	}
 }
@@ -140,10 +143,41 @@ impl WriteTo for u8 {
 impl WriteTo for i8 {
 	type Error = io::Error;
 
-	fn write_to<W: Write>(&self, mut out: W) -> io::Result<usize> {
+	#[inline]
+	fn write_to<W: Write>(&self, mut out: W) -> Result<usize, Self::Error> {
 		out.write_all(&[*self as u8]).and(Ok(1))
 	}
 }
+
+macro_rules! impl_for_array {
+	($($len:literal)*) => {
+		$(
+			impl ReadFrom for [u8; $len] {
+				type Error = io::Error;
+
+				fn read_from<R: Read>(mut inp: R) -> Result<Self, Self::Error> {
+					let mut buf = [0; $len];
+					inp.read_exact(&mut buf).and(Ok(buf))
+				}
+			}
+
+			impl WriteTo for [u8; $len] {
+				type Error = io::Error;
+
+				fn write_to<W: Write>(&self, mut out: W) -> Result<usize, Self::Error> {
+					out.write_all(self).and(Ok($len))
+				}
+			}
+		)*
+	};
+}
+
+impl_for_array!(
+	 0  1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16 
+	17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 
+	64 128 256 512 1024 2048 4096 8192
+	50 100 250 500 1000 2500 5000 10000
+);
 
 /// A type that can be used to read/write integers in a little-endian format.
 ///
@@ -247,3 +281,4 @@ impl_endian_traits!(
 );
 
 // TODO: char
+
