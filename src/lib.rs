@@ -240,4 +240,10 @@ macro_rules! impl_endian_traits {
 	};
 }
 
-impl_endian_traits!(u8 i8 u16 i16 u32 i32 u64 i64 u128 i128 f32 f64);
+impl_endian_traits!(
+	u8 u16 u32 u64 u128 usize
+	i8 i16 i32 i64 i128 isize
+	f32 f64
+);
+
+// TODO: char
